@@ -14,6 +14,7 @@ import BadgeAchievedModal from "@/components/badge-achieved-modal"
 import CertificateModal from "@/components/certificate-modal"
 import NotesModal from "@/components/notes-modal"
 import { toast } from "@/components/ui/use-toast"
+import { useAuth } from "@/components/auth-provider"
 
 // Mock course data (same as in course detail page)
 const courses = [
@@ -820,6 +821,8 @@ export default function CourseLearnPage() {
   const [generatedNotes, setGeneratedNotes] = useState<string | null>(null)
   const [isGeneratingNotes, setIsGeneratingNotes] = useState(false)
 
+  const { user } = useAuth()
+
   useEffect(() => {
     // Simulate API call to fetch course details
     const fetchCourse = () => {
@@ -1330,7 +1333,7 @@ export default function CourseLearnPage() {
         isOpen={showCertificateModal}
         onClose={() => setShowCertificateModal(false)}
         courseTitle={course.title}
-        studentName="Rahul Patel"
+        studentName={user?.name || "Student"}
         completionDate={new Date().toLocaleDateString()}
         certificateId={`CERT-${Math.random().toString(36).substring(2, 10).toUpperCase()}`}
       />

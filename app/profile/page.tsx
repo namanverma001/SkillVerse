@@ -797,7 +797,7 @@ export default function ProfilePage() {
           isOpen={showCertificateModal}
           onClose={() => setShowCertificateModal(false)}
           courseTitle={selectedCertificate?.courseTitle || ""}
-          studentName={user?.name || "Student Name"}
+          studentName={user?.name || "Student"}
           completionDate={selectedCertificate ? new Date(selectedCertificate.issueDate).toLocaleDateString() : ""}
           certificateId={selectedCertificate?.certificateId || ""}
         />

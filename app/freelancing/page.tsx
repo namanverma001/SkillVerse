@@ -24,9 +24,11 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
+import JobApplicationModal from "@/components/job-application-modal"
+import FreelancerCard from "@/components/freelancer-card"
+import Image from "next/image"
 
 // Mock data
 const jobs = [
@@ -121,6 +123,118 @@ const categories = [
   "Translation",
 ]
 
+// Top freelancers data
+const topFreelancers = [
+  {
+    id: 1,
+    name: "Rahul Patel",
+    specialty: "Full-Stack Web Developer",
+    skills: ["React", "Node.js", "MongoDB", "TypeScript", "AWS"],
+    rating: 4.9,
+    projects: 24,
+    image: "/placeholder.svg?height=200&width=200&text=RP&color=4F46E5&background=EEF2FF",
+    bio: "Full-stack developer with 5+ years of experience building scalable web applications. Specialized in React and Node.js with a focus on performance optimization and clean code architecture.",
+    portfolio: [
+      {
+        title: "E-commerce Platform",
+        description:
+          "Built a full-featured e-commerce platform with React, Node.js, and MongoDB with payment integration.",
+        image: "/placeholder.svg?height=300&width=400&text=E-commerce&color=4F46E5&background=EEF2FF",
+      },
+      {
+        title: "Real-time Dashboard",
+        description: "Developed a real-time analytics dashboard using Socket.io and D3.js for data visualization.",
+        image: "/placeholder.svg?height=300&width=400&text=Dashboard&color=4F46E5&background=EEF2FF",
+      },
+    ],
+    website: "https://rahulpatel.dev",
+    email: "rahul@example.com",
+    location: "Mumbai, India",
+    hourlyRate: "$45",
+    availability: "Available",
+  },
+  {
+    id: 2,
+    name: "Priya Sharma",
+    specialty: "UI/UX & Graphic Designer",
+    skills: ["Figma", "Adobe XD", "Illustrator", "Photoshop", "Branding"],
+    rating: 4.8,
+    projects: 32,
+    image: "/placeholder.svg?height=200&width=200&text=PS&color=EC4899&background=FCE7F3",
+    bio: "Award-winning designer with expertise in creating intuitive user interfaces and compelling brand identities. Passionate about user-centered design and accessibility.",
+    portfolio: [
+      {
+        title: "Finance App Redesign",
+        description: "Complete UI/UX redesign for a financial services app focusing on simplicity and user engagement.",
+        image: "/placeholder.svg?height=300&width=400&text=Finance+App&color=EC4899&background=FCE7F3",
+      },
+      {
+        title: "Brand Identity System",
+        description: "Created comprehensive brand identity including logo, color palette, typography, and guidelines.",
+        image: "/placeholder.svg?height=300&width=400&text=Brand+Identity&color=EC4899&background=FCE7F3",
+      },
+    ],
+    website: "https://priyaportfolio.com",
+    email: "priya@example.com",
+    location: "Bangalore, India",
+    hourlyRate: "$40",
+    availability: "Limited Availability",
+  },
+  {
+    id: 3,
+    name: "Ananya Singh",
+    specialty: "Content Strategist & Writer",
+    skills: ["SEO Content", "Technical Writing", "Copywriting", "Content Strategy", "Editing"],
+    rating: 4.7,
+    projects: 18,
+    image: "/placeholder.svg?height=200&width=200&text=AS&color=0EA5E9&background=E0F2FE",
+    bio: "Content strategist and writer specializing in technical content, SEO optimization, and brand storytelling. Experience working with startups and tech companies to improve content engagement.",
+    portfolio: [
+      {
+        title: "Tech Blog Series",
+        description: "Created a series of technical blog posts that increased organic traffic by 45% in three months.",
+        image: "/placeholder.svg?height=300&width=400&text=Tech+Blog&color=0EA5E9&background=E0F2FE",
+      },
+      {
+        title: "Product Documentation",
+        description: "Developed comprehensive user documentation and guides for a SaaS platform.",
+        image: "/placeholder.svg?height=300&width=400&text=Documentation&color=0EA5E9&background=E0F2FE",
+      },
+    ],
+    email: "ananya@example.com",
+    location: "Delhi, India",
+    hourlyRate: "$35",
+    availability: "Available",
+  },
+  {
+    id: 4,
+    name: "Vikram Mehta",
+    specialty: "Mobile App Developer",
+    skills: ["React Native", "Flutter", "iOS", "Android", "Firebase"],
+    rating: 4.9,
+    projects: 21,
+    image: "/placeholder.svg?height=200&width=200&text=VM&color=10B981&background=D1FAE5",
+    bio: "Mobile app developer with expertise in cross-platform development using React Native and Flutter. Created apps with millions of downloads across various industries.",
+    portfolio: [
+      {
+        title: "Health & Fitness App",
+        description: "Developed a fitness tracking app with custom animations and real-time progress tracking.",
+        image: "/placeholder.svg?height=300&width=400&text=Fitness+App&color=10B981&background=D1FAE5",
+      },
+      {
+        title: "Food Delivery Platform",
+        description: "Built a complete food delivery app with real-time order tracking and payment processing.",
+        image: "/placeholder.svg?height=300&width=400&text=Food+App&color=10B981&background=D1FAE5",
+      },
+    ],
+    website: "https://vikrammehta.dev",
+    email: "vikram@example.com",
+    location: "Pune, India",
+    hourlyRate: "$50",
+    availability: "Available",
+  },
+]
+
 export default function FreelancingPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -128,6 +242,10 @@ export default function FreelancingPage() {
   const [activeProjects, setActiveProjects] = useState<any[]>([])
   const [completedProjects, setCompletedProjects] = useState<any[]>([])
   const { toast } = useToast()
+
+  // First, let's add a new state for the application modal
+  const [showApplicationModal, setShowApplicationModal] = useState(false)
+  const [selectedJob, setSelectedJob] = useState<any>(null)
 
   // Load saved project data from localStorage
   useEffect(() => {
@@ -160,7 +278,8 @@ export default function FreelancingPage() {
   })
 
   // Handle job application
-  const handleApplyJob = (job: any) => {
+  // Add this after the other handler functions
+  const handleApplyJobClick = (job: any) => {
     // Check if already applied
     const alreadyApplied = activeProjects.some((project) => project.id === job.id)
 
@@ -173,15 +292,24 @@ export default function FreelancingPage() {
       return
     }
 
+    // Set the selected job and show the modal
+    setSelectedJob(job)
+    setShowApplicationModal(true)
+  }
+
+  // Modify the handleApplyJob function to be used by the modal
+  const handleApplyJob = () => {
+    if (!selectedJob) return
+
     // Create new project
     const newProject = {
-      id: job.id,
-      title: job.title,
-      client: job.client,
+      id: selectedJob.id,
+      title: selectedJob.title,
+      client: selectedJob.client,
       status: "In Progress",
       startDate: new Date().toLocaleDateString(),
-      dueDate: calculateDueDate(job.duration),
-      payment: job.budget,
+      dueDate: calculateDueDate(selectedJob.duration),
+      payment: selectedJob.budget,
       progress: 20,
     }
 
@@ -196,6 +324,9 @@ export default function FreelancingPage() {
       title: "Application Submitted",
       description: "Your job application has been submitted successfully!",
     })
+
+    // Close the modal
+    setShowApplicationModal(false)
   }
 
   // Calculate due date based on duration
@@ -414,7 +545,7 @@ export default function FreelancingPage() {
                             <span>{job.postedDate}</span>
                             <span>{job.proposals} proposals</span>
                           </div>
-                          <Button onClick={() => handleApplyJob(job)}>
+                          <Button onClick={() => handleApplyJobClick(job)}>
                             Apply Now <ArrowRight className="ml-2 h-4 w-4" />
                           </Button>
                         </CardFooter>
@@ -613,78 +744,9 @@ export default function FreelancingPage() {
               <CardDescription>Connect with successful freelancers in our community</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  {
-                    id: 1,
-                    name: "Rahul Patel",
-                    specialty: "Web Development",
-                    skills: ["React", "Node.js", "MongoDB"],
-                    rating: 4.9,
-                    projects: 24,
-                    image: "/placeholder.svg?height=200&width=200",
-                  },
-                  {
-                    id: 2,
-                    name: "Priya Sharma",
-                    specialty: "Graphic Design",
-                    skills: ["Illustrator", "Photoshop", "Branding"],
-                    rating: 4.8,
-                    projects: 32,
-                    image: "/placeholder.svg?height=200&width=200",
-                  },
-                  {
-                    id: 3,
-                    name: "Ananya Singh",
-                    specialty: "Content Writing",
-                    skills: ["Blog Writing", "SEO", "Copywriting"],
-                    rating: 4.7,
-                    projects: 18,
-                    image: "/placeholder.svg?height=200&width=200",
-                  },
-                ].map((freelancer) => (
-                  <Card key={freelancer.id} className="border overflow-hidden">
-                    <div className="p-6 flex flex-col items-center text-center">
-                      <div className="relative h-24 w-24 rounded-full overflow-hidden mb-4">
-                        <Image
-                          src={freelancer.image || "/placeholder.svg"}
-                          alt={freelancer.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <h3 className="font-medium">{freelancer.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">{freelancer.specialty}</p>
-                      <div className="flex items-center mb-4">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < Math.floor(freelancer.rating)
-                                ? "text-yellow-500 fill-yellow-500"
-                                : i < freelancer.rating
-                                  ? "text-yellow-500 fill-yellow-500 opacity-50"
-                                  : "text-muted-foreground"
-                            }`}
-                          />
-                        ))}
-                        <span className="ml-2 text-sm">{freelancer.rating}</span>
-                      </div>
-                      <div className="flex flex-wrap justify-center gap-2 mb-4">
-                        {freelancer.skills.map((skill, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="text-sm text-muted-foreground mb-4">
-                        <span className="font-medium">{freelancer.projects}</span> projects completed
-                      </div>
-                      <Button variant="outline" size="sm">
-                        View Profile
-                      </Button>
-                    </div>
-                  </Card>
+              <div className="grid grid-cols-1 gap-6">
+                {topFreelancers.map((freelancer) => (
+                  <FreelancerCard key={freelancer.id} freelancer={freelancer} />
                 ))}
               </div>
             </CardContent>
@@ -748,8 +810,78 @@ export default function FreelancingPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Freelancer Success Stories</CardTitle>
+              <CardDescription>Learn from successful freelancers in our community</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="border overflow-hidden">
+                  <div className="relative h-48 w-full">
+                    <Image
+                      src="/placeholder.svg?height=400&width=600&text=Success+Story&color=4F46E5&background=EEF2FF"
+                      alt="Success Story"
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute bottom-4 left-4">
+                      <h3 className="text-lg font-bold text-white">From Beginner to Expert</h3>
+                      <p className="text-sm text-white/80">Rahul's journey in web development</p>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <p className="text-sm text-muted-foreground">
+                      "I started freelancing as a side hustle while studying. Within a year, I was earning more from
+                      freelancing than my previous full-time job would have paid. The platform connected me with clients
+                      I could never have reached otherwise."
+                    </p>
+                    <Button variant="outline" size="sm" className="mt-4">
+                      Read Full Story
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="border overflow-hidden">
+                  <div className="relative h-48 w-full">
+                    <Image
+                      src="/placeholder.svg?height=400&width=600&text=Success+Story&color=EC4899&background=FCE7F3"
+                      alt="Success Story"
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute bottom-4 left-4">
+                      <h3 className="text-lg font-bold text-white">Building a Design Agency</h3>
+                      <p className="text-sm text-white/80">Priya's entrepreneurial journey</p>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <p className="text-sm text-muted-foreground">
+                      "What started as freelance design work for small businesses has grown into my own design agency
+                      with five team members. The skills and client relationships I built through freelancing were
+                      invaluable to this growth."
+                    </p>
+                    <Button variant="outline" size="sm" className="mt-4">
+                      Read Full Story
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
+      {showApplicationModal && selectedJob && (
+        <JobApplicationModal
+          isOpen={showApplicationModal}
+          onClose={() => setShowApplicationModal(false)}
+          onApply={handleApplyJob}
+          job={selectedJob}
+        />
+      )}
     </div>
   )
 

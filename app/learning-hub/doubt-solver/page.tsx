@@ -1188,9 +1188,21 @@ export default function DoubtSolverPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
 
+  // Add this new useEffect for initial page load
+  useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0)
+  }, [])
+
   // Auto-scroll to bottom of messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    // Scroll only within the message container
+    if (messagesEndRef.current) {
+      const messageContainer = messagesEndRef.current.parentElement
+      if (messageContainer) {
+        messageContainer.scrollTop = messageContainer.scrollHeight
+      }
+    }
   }, [messages])
 
   const handleSendMessage = async () => {
@@ -1224,6 +1236,9 @@ export default function DoubtSolverPage() {
       }
 
       setMessages((prev) => [...prev, assistantMessage])
+
+      // Prevent page from scrolling down
+      window.scrollTo(0, 0)
     } catch (error) {
       toast({
         title: "Error",
@@ -1333,7 +1348,7 @@ export default function DoubtSolverPage() {
         {/* Main Chat Area */}
         <div className="lg:col-span-3">
           <Card className="flex flex-col h-[calc(100vh-12rem)]">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 sticky top-0 bg-card z-10">
               <CardTitle>Chat with AI Doubt Solver</CardTitle>
               <CardDescription>Ask any programming or learning question</CardDescription>
             </CardHeader>

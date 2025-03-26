@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -24,6 +23,8 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
+import ScholarshipApplicationModal from "@/components/scholarship-application-modal"
+import ScholarshipCard from "@/components/scholarship-card"
 
 // Mock data
 const scholarships = [
@@ -35,8 +36,9 @@ const scholarships = [
     deadline: "June 15, 2023",
     category: "Technology",
     eligibility: ["Computer Science students", "GPA 3.5+", "2nd year or above"],
-    description: "Supporting students pursuing careers in technology and innovation.",
-    image: "/placeholder.svg?height=400&width=600",
+    description:
+      "Supporting students pursuing careers in technology and innovation with focus on AI and machine learning projects.",
+    image: "/images/scholarships/tech-scholarship.jpg",
     match: 95,
   },
   {
@@ -47,8 +49,9 @@ const scholarships = [
     deadline: "July 30, 2023",
     category: "STEM",
     eligibility: ["Female students", "STEM fields", "Any year"],
-    description: "Empowering women to pursue education and careers in STEM fields.",
-    image: "/placeholder.svg?height=400&width=600",
+    description:
+      "Empowering women to pursue education and careers in STEM fields with mentorship and networking opportunities.",
+    image: "/images/scholarships/women-stem-scholarship.jpg",
     match: 87,
   },
   {
@@ -59,8 +62,9 @@ const scholarships = [
     deadline: "August 20, 2023",
     category: "Leadership",
     eligibility: ["International students", "Leadership experience", "Any field"],
-    description: "Supporting future global leaders with demonstrated leadership potential.",
-    image: "/placeholder.svg?height=400&width=600",
+    description:
+      "Supporting future global leaders with demonstrated leadership potential and commitment to cross-cultural understanding.",
+    image: "/images/scholarships/global-leadership-scholarship.jpg",
     match: 78,
   },
   {
@@ -71,8 +75,9 @@ const scholarships = [
     deadline: "September 5, 2023",
     category: "Arts",
     eligibility: ["Arts & Design students", "Portfolio required", "Any year"],
-    description: "Supporting creative excellence in visual arts, design, music, and performing arts.",
-    image: "/placeholder.svg?height=400&width=600",
+    description:
+      "Supporting creative excellence in visual arts, design, music, and performing arts with exhibition opportunities.",
+    image: "/images/scholarships/creative-arts-scholarship.jpg",
     match: 65,
   },
   {
@@ -83,8 +88,9 @@ const scholarships = [
     deadline: "July 15, 2023",
     category: "Diversity",
     eligibility: ["First-generation college students", "Financial need", "Any field"],
-    description: "Supporting students who are the first in their family to attend college.",
-    image: "/placeholder.svg?height=400&width=600",
+    description:
+      "Supporting students who are the first in their family to attend college with financial aid and academic support services.",
+    image: "/images/scholarships/first-gen-scholarship.jpg",
     match: 92,
   },
   {
@@ -95,8 +101,9 @@ const scholarships = [
     deadline: "August 10, 2023",
     category: "Environment",
     eligibility: ["Environmental Science/Studies", "Research proposal", "3rd year or above"],
-    description: "Supporting students committed to environmental conservation and sustainability.",
-    image: "/placeholder.svg?height=400&width=600",
+    description:
+      "Supporting students committed to environmental conservation and sustainability with fieldwork opportunities.",
+    image: "/images/scholarships/environmental-scholarship.jpg",
     match: 70,
   },
 ]
@@ -110,6 +117,10 @@ export default function ScholarshipsPage() {
   const [applicationStatus, setApplicationStatus] = useState<any[]>([])
   const [successStories, setSuccessStories] = useState<any[]>([])
   const { toast } = useToast()
+
+  // First, let's add a new state for the application modal
+  const [showApplicationModal, setShowApplicationModal] = useState(false)
+  const [selectedScholarship, setSelectedScholarship] = useState<any>(null)
 
   // Load saved application data from localStorage
   useEffect(() => {
@@ -131,7 +142,7 @@ export default function ScholarshipsPage() {
         year: "2022",
         story:
           "The scholarship helped me focus on my studies without financial stress. I'm now working at a leading tech company.",
-        image: "/placeholder.svg?height=200&width=200",
+        image: "/placeholder.svg?height=200&width=200&text=PS&color=D946EF&background=FAE8FF",
       },
       {
         id: 2,
@@ -141,7 +152,7 @@ export default function ScholarshipsPage() {
         year: "2021",
         story:
           "This scholarship funded my final year project which won a national innovation award. I'm now pursuing my Master's degree.",
-        image: "/placeholder.svg?height=200&width=200",
+        image: "/placeholder.svg?height=200&width=200&text=RP&color=4F46E5&background=EEF2FF",
       },
       {
         id: 3,
@@ -151,7 +162,7 @@ export default function ScholarshipsPage() {
         year: "2022",
         story:
           "The scholarship allowed me to study abroad for a semester, broadening my perspective and building international connections.",
-        image: "/placeholder.svg?height=200&width=200",
+        image: "/placeholder.svg?height=200&width=200&text=AS&color=0EA5E9&background=E0F2FE",
       },
     ])
   }, [])
@@ -168,7 +179,7 @@ export default function ScholarshipsPage() {
   })
 
   // Handle scholarship application
-  const handleApplyScholarship = (scholarship: any) => {
+  const handleApplyScholarshipClick = (scholarship: any) => {
     // Check if already applied
     const alreadyApplied = applicationStatus.some((app) => app.id === scholarship.id)
 
@@ -181,14 +192,23 @@ export default function ScholarshipsPage() {
       return
     }
 
+    // Set the selected scholarship and show the modal
+    setSelectedScholarship(scholarship)
+    setShowApplicationModal(true)
+  }
+
+  // Modify the handleApplyScholarship function to be used by the modal
+  const handleApplyScholarship = () => {
+    if (!selectedScholarship) return
+
     // Create new application
     const newApplication = {
-      id: scholarship.id,
-      title: scholarship.title,
-      provider: scholarship.provider,
+      id: selectedScholarship.id,
+      title: selectedScholarship.title,
+      provider: selectedScholarship.provider,
       status: "Under Review",
       appliedDate: new Date().toLocaleDateString(),
-      amount: scholarship.amount,
+      amount: selectedScholarship.amount,
       progress: 50,
     }
 
@@ -203,6 +223,9 @@ export default function ScholarshipsPage() {
       title: "Application Submitted",
       description: "Your scholarship application has been submitted successfully!",
     })
+
+    // Close the modal
+    setShowApplicationModal(false)
   }
 
   // Handle document upload
@@ -332,66 +355,11 @@ export default function ScholarshipsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredScholarships.length > 0 ? (
                   filteredScholarships.map((scholarship) => (
-                    <motion.div key={scholarship.id} whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-                      <Card className="h-full flex flex-col overflow-hidden">
-                        <div className="relative h-48 w-full">
-                          <Image
-                            src={scholarship.image || "/placeholder.svg"}
-                            alt={scholarship.title}
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute top-2 right-2">
-                            <Badge className="bg-primary">{scholarship.match}% Match</Badge>
-                          </div>
-                          <div className="absolute bottom-2 left-2">
-                            <Badge variant="outline" className="bg-background/80 backdrop-blur-sm text-foreground">
-                              {scholarship.category}
-                            </Badge>
-                          </div>
-                        </div>
-                        <CardHeader className="pb-2">
-                          <div className="flex justify-between items-start">
-                            <CardTitle className="text-lg">{scholarship.title}</CardTitle>
-                            <Badge variant="outline" className="ml-2">
-                              <DollarSign className="h-3 w-3 mr-1" />
-                              {scholarship.amount}
-                            </Badge>
-                          </div>
-                          <CardDescription className="flex items-center">
-                            <Building className="h-3 w-3 mr-1" />
-                            {scholarship.provider}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pb-2 flex-grow">
-                          <p className="text-sm text-muted-foreground mb-4">{scholarship.description}</p>
-                          <div className="space-y-2">
-                            <div className="flex items-center text-sm">
-                              <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                              <span>
-                                Deadline: <span className="font-medium">{scholarship.deadline}</span>
-                              </span>
-                            </div>
-                            <div className="space-y-1">
-                              <p className="text-sm font-medium">Eligibility:</p>
-                              <ul className="text-sm text-muted-foreground space-y-1">
-                                {scholarship.eligibility.map((item, index) => (
-                                  <li key={index} className="flex items-start">
-                                    <span className="mr-2">•</span>
-                                    <span>{item}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          </div>
-                        </CardContent>
-                        <CardFooter className="pt-2 border-t">
-                          <Button className="w-full" onClick={() => handleApplyScholarship(scholarship)}>
-                            Apply Now <ArrowRight className="ml-2 h-4 w-4" />
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    </motion.div>
+                    <ScholarshipCard
+                      key={scholarship.id}
+                      scholarship={scholarship}
+                      onApply={handleApplyScholarshipClick}
+                    />
                   ))
                 ) : (
                   <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
@@ -508,7 +476,7 @@ export default function ScholarshipsPage() {
                         </div>
                         <Badge>{scholarship.match}% Match</Badge>
                       </div>
-                      <Button className="w-full mt-4" onClick={() => handleApplyScholarship(scholarship)}>
+                      <Button className="w-full mt-4" onClick={() => handleApplyScholarshipClick(scholarship)}>
                         Apply
                       </Button>
                     </CardContent>
@@ -609,6 +577,14 @@ export default function ScholarshipsPage() {
           </Card>
         </TabsContent>
       </Tabs>
+      {showApplicationModal && selectedScholarship && (
+        <ScholarshipApplicationModal
+          isOpen={showApplicationModal}
+          onClose={() => setShowApplicationModal(false)}
+          onApply={handleApplyScholarship}
+          scholarship={selectedScholarship}
+        />
+      )}
     </div>
   )
 }
