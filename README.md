@@ -70,5 +70,8 @@ Contributions are welcome! Feel free to open issues and pull requests.
 4. Push to the branch (`git push origin feature-branch`).
 5. Open a pull request.
 
+   
+## 🎥 Live Demo
+Check out the live version: [SkillVerse Demo](https://skillverse-hfw4.onrender.com/)
 
 
