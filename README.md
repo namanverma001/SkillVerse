@@ -1,6 +1,6 @@
 # SkillVerse
 
-SkillVerse is a one-stop solution to help people from low-income backgrounds learn and grow. It provides free educational resources, scholarships, and freelancing opportunities, empowering students to build their careers while overcoming financial barriers.
+SkillVerse is a one-stop solution to help people from low-income backgrounds learn and grow. It provides free educational resources, scholarships, and freelancing opportunities, empowering students to build their careers while overcoming financial barriers. Offers AI-generated video notes and an interactive AI chatbot to simplify learning and enhance student support.
 
 ## 🚀 Features
 
